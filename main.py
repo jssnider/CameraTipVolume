@@ -37,18 +37,14 @@ if __name__ == '__main__':
     vfn = DEFAULT_VIDEO_FILENAME
     lfn = DEFAULT_LOG_FILENAME
     if len(sys.argv) >= 2:
+        print(f"{len(sys.argv)=}")
         for arg in sys.argv:
             if str.isnumeric(arg): # just a number must be duration
                 duration = float(arg)
-            elif len(arg) > len("capture:"):
-                if arg[0:len("capture:")] == 'capture:': # capture with duration
-                    param = arg[len("capture:"):]
-                    if str.isnumeric(param):
-                        duration = float(param)
-            elif len(arg) > len("file:"):
-                if arg[0:len("file:")] == "file:": # base of filenames
+            elif arg.startswith("file:"): # base of filenames
+                    print(f"file {arg=}")
                     param = arg[len("file:"):]
-                    if genericpath.isfile(param):
-                        vfn = param + ".avi"
-                        lfn = param + ".csv"
+                    print(f"file {param=}")
+                    vfn = param + ".avi"
+                    lfn = param + ".csv"
     capture(duration, vfn, lfn)
