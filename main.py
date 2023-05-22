@@ -2,18 +2,21 @@ import genericpath
 import sys
 import time
 from TipMeasurement import CameraInterface
+import socket
+import inspect
 
+PORT = 65432
 DEFAULT_CAPTURE_TIME = 2
 DEFAULT_VIDEO_FILENAME = "foo.avi"
 DEFAULT_LOG_FILENAME = "log.csv"
 
-def capture(duration=DEFAULT_CAPTURE_TIME, vid_filename=DEFAULT_VIDEO_FILENAME, log_filename=DEFAULT_LOG_FILENAME):
+def capture(duration:str=DEFAULT_CAPTURE_TIME, vid_filename:str=DEFAULT_VIDEO_FILENAME, log_filename:str=DEFAULT_LOG_FILENAME):
     print(f"capture to {vid_filename} for {duration} seconds")
     video_writer = CameraInterface(vid_filename, tipName = "P50", src=1)
     video_writer.start_recording()
     video_writer.start_measuring()
     video_writer.show_message("Measuring fluid")
-    time.sleep(duration)
+    time.sleep(int(duration))
     video_writer.stop_measuring()
     v = video_writer.get_volume()
     t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -29,7 +32,39 @@ def PrintAndLog(s: str, file = DEFAULT_LOG_FILENAME, header = ''):
         fp.writelines(header)
     line = f'{s}\n'
     fp.writelines(line)
-    fp.close()    
+    fp.close()
+
+def receive(port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    try:
+        sock.bind(("localhost", port))
+        sock.listen(1)
+        print(f"Receiver is listening on {port=}.")
+        
+        while True:
+            conn, addr = sock.accept()
+            data = conn.recv(1024).decode()
+            print(f"Received: {data=}")
+            response = f"Received {data=}"
+            conn.sendall(response.encode())
+            conn.close()
+
+            call ="call "
+            if data.lower().__contains__("stop"):
+                break
+            elif data.lower().startswith(call):
+                s = data.removeprefix(call).split(" ")
+                func = globals().get(s[0])
+                if callable(func):
+                    sig = inspect.signature(func)
+                    sig_params = sig.parameters
+                    params = s[1:]
+                    if len(sig_params) == len(params):
+                        print(f"calling {s}")
+                        func(*params)
+    finally:
+        sock.close()
 
 ##############################################################################
 if __name__ == '__main__':
@@ -47,4 +82,5 @@ if __name__ == '__main__':
                     print(f"file {param=}")
                     vfn = param + ".avi"
                     lfn = param + ".csv"
-    capture(duration, vfn, lfn)
+    receive(65432)
+    # capture(duration, vfn, lfn)
