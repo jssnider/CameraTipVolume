@@ -21,7 +21,7 @@ import time
 class CameraInterface(object):
     def __init__(self, video_file_name, tipName = None, src=0): # src is for which camera to use
         # Create a VideoCapture object
-        self.PIXELS_PER_MM = 494 / 51.36 # majik number to convert pixel to height for lookup to get a volume
+        self.PIXELS_PER_MM = 582 / 51.36 # majik number to convert pixel to height for lookup to get a volume
         self.frame_name = video_file_name  # if using webcams, else just use src as it is.
         self.video_file = video_file_name
         self.img_counter = 0
