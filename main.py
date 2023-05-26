@@ -6,13 +6,14 @@ import socket
 import inspect
 
 PORT = 65432
+CAMERA_NUMBER = 1
 DEFAULT_CAPTURE_TIME = 2
 DEFAULT_VIDEO_FILENAME = "foo.avi"
 DEFAULT_LOG_FILENAME = "log.csv"
 
 def capture(duration:str=DEFAULT_CAPTURE_TIME, vid_filename:str=DEFAULT_VIDEO_FILENAME, log_filename:str=DEFAULT_LOG_FILENAME):
     print(f"capture to {vid_filename} for {duration} seconds")
-    video_writer = CameraInterface(vid_filename, tipName = "P50", src=1)
+    video_writer = CameraInterface(vid_filename, tipName = "P50", src=CAMERA_NUMBER)
     video_writer.start_recording()
     video_writer.start_measuring()
     video_writer.show_message("Measuring fluid")
@@ -82,5 +83,6 @@ if __name__ == '__main__':
                     print(f"file {param=}")
                     vfn = param + ".avi"
                     lfn = param + ".csv"
-    receive(65432)
-    # capture(duration, vfn, lfn)
+    receive(PORT) # Use this to wait for command to come in
+    # capture(duration, vfn, lfn) # Use this to record for a given duration
+
