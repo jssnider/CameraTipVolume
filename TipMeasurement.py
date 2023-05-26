@@ -175,6 +175,7 @@ class CameraInterface(object):
             cv2.putText(newFrame, display, (10, 570), cv2.FONT_HERSHEY_TRIPLEX, 0.8, (0, 255, 0), 2)
             self.frame_counter = self.frame_counter + 1
             cv2.imshow(self.frame_name, newFrame)
+            cv2.setWindowProperty(self.frame_name, cv2.WND_PROP_TOPMOST, 1.0)
             if self.video_file != "":
                 self.output_video.write(newFrame)
         # Press Q on keyboard to stop recording
@@ -375,6 +376,10 @@ class CameraInterface(object):
                 # self.save_frame()
             except AttributeError:
                 pass
+        try:
+            cv2.destroyWindow(self.frame_name)
+        except:
+            pass
 
     def start_recording(self):
         # Create another thread to show/save frames
